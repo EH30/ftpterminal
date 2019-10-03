@@ -3,6 +3,14 @@ import sys
 import os, re
 
 
+"""
+
+Created By: EH
+=====================
+I made This Script For Fun
+
+"""
+
 current_dir = "/>"
 
 def check_system():
@@ -40,6 +48,19 @@ def filedownload(namefile):
     localfile.close()
 
 
+def usage():
+    commands = """ 
+Commands 
+----------------------------------
+
+cd                             This will Change Directory
+ls                             This will List All The files in The Directory
+cd ..                          This will go Back in Directory
+Download "Your File name "     This will doload a file from FTP Host
+upload "Your File name"        This will Uoload a File 
+"""
+    return commands
+
 
 def start():    
     global username, pwd, ftpserver, ftp, current_dir
@@ -47,13 +68,14 @@ def start():
     ftp = ftplib.FTP(ftpserver)
     ftp.login(username, pwd)
     check_system()
+
+
     pattern_cd = r"cd"
     pattern_upload = r"upload"
     pattern_download = r"download"
 
     while True:
         user_input = str(input(current_dir)) 
-
 
         if re.search(pattern_cd, user_input):
             directory_current = cd(user_input.strip("cd "))
@@ -66,12 +88,11 @@ def start():
             check_system()
         elif re.search(pattern_download, user_input):
             filedownload(user_input.strip("download "))
+        elif user_input == "help":
+            print(usage())
         else:
             print("ERROR")
 
-
-#ftp.cwd("htdocs")
-#ftp.retrlines("LIST")
 
 if __name__ == "__main__":
     start()
