@@ -28,24 +28,38 @@ username = str(input("Username: "))
 pwd = str(input("Password: "))
 
 def cd(dir):
-    return ftp.cwd(dir) 
-
+    try:
+        change_directory = ftp.cwd(dir)
+        return change_directory 
+    except Exception as error:
+        print(error)
+        print("\033[1;32m ERROR \033[1;m")
+        pass
 
 def upload(filename):
-    
-    opnr = open(filename, "rb")
-    ftp.storbinary("STOR ehfile.txt", opnr)
-
+    try:
+        opnr = open(filename, "rb")
+        ftp.storbinary("STOR ehfile.txt", opnr)
+    except Exception as error:
+        print(error)
+        print("\033[1;32m ERROR \033[1;m")
+        pass
 
 def filedownload(namefile):
 
-    filename = namefile
+    try:
+        filename = namefile
+        
+        localfile = open(filename, 'wb')
+        ftp.retrbinary('RETR ' + filename, localfile.write, 1024)
+        
+        ftp.quit()
+        localfile.close()
 
-    localfile = open(filename, 'wb')
-    ftp.retrbinary('RETR ' + filename, localfile.write, 1024)
-
-    ftp.quit()
-    localfile.close()
+    except Exception as error:
+        print(error)
+        print("\033[1;32m ERROR \033[1;m")
+        pass
 
 
 def usage():
@@ -75,24 +89,31 @@ def start():
     pattern_download = r"download"
 
     while True:
-        user_input = str(input(current_dir)) 
+        try:
+            user_input = str(input(current_dir)) 
+            
+            if re.search(pattern_cd, user_input):
+                directory_current = cd(user_input.lstrip("cd "))
+                current_dir = directory_current.lstrip("'250 OK. Current directory is ") + "/>"
+            elif user_input == "ls":
+                ftp.retrlines("LIST")
+            elif re.search(pattern_upload, user_input):
+                upload(user_input.lstrip("upload "))
+            elif user_input == "clear":
+                check_system()
+            elif re.search(pattern_download, user_input):
+                filedownload(user_input.lstrip("download "))
+            elif user_input == "help":
+                print(usage())
+            else:
+                print("ERROR")
+        except KeyboardInterrupt:
+            exit()
 
-        if re.search(pattern_cd, user_input):
-            directory_current = cd(user_input.strip("cd "))
-            current_dir = directory_current.lstrip("'250 OK. Current directory is ") + "/>"
-        elif user_input == "ls":
-            ftp.retrlines("LIST")
-        elif re.search(pattern_upload, user_input):
-            upload(user_input.lstrip("upload "))
-        elif user_input == "clear":
-            check_system()
-        elif re.search(pattern_download, user_input):
-            filedownload(user_input.lstrip("download "))
-        elif user_input == "help":
-            print(usage())
-        else:
-            print("ERROR")
-
+        except Exception as error:
+            print(error)
+            print("\033[1;32m ERROR \033[1;m")
+            pass
 
 if __name__ == "__main__":
     start()
