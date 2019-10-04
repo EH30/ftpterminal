@@ -83,11 +83,11 @@ def start():
         elif user_input == "ls":
             ftp.retrlines("LIST")
         elif re.search(pattern_upload, user_input):
-            upload(user_input.strip("upload "))
+            upload(user_input.lstrip("upload "))
         elif user_input == "clear":
             check_system()
         elif re.search(pattern_download, user_input):
-            filedownload(user_input.strip("download "))
+            filedownload(user_input.lstrip("download "))
         elif user_input == "help":
             print(usage())
         else:
